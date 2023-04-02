@@ -4,7 +4,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import com.english.eva.service.MeaningService;
 import com.english.eva.service.WordService;
+import com.english.eva.ui.panel.meaning.MeaningTree;
 
 public class WordsTable extends JTable {
 
@@ -17,7 +19,7 @@ public class WordsTable extends JTable {
       "ID", "Word", "Translation", "Frequency", "Levels", "Parts of speech", "Topic"
   };
 
-  public WordsTable() {
+  public WordsTable(MeaningTree meaningTree) {
     setModel(new DefaultTableModel(getWordsData(), COLUMNS));
     getColumnModel().getColumn(0).setMinWidth(0);
     getColumnModel().getColumn(0).setMaxWidth(0);
@@ -41,7 +43,7 @@ public class WordsTable extends JTable {
       System.out.println("--------");
     });
 
-    addMouseListener(new PopClickListener(this));
+    addMouseListener(new TableClickListener(this, meaningTree));
   }
 
   private String[][] getWordsData() {
@@ -56,4 +58,11 @@ public class WordsTable extends JTable {
         })
         .toArray(String[][]::new);
   }
+
+  //  private static boolean isEmpty(EnvironmentInfo env) {
+//    return Stream.of(
+//            env.getName(), env.getRegion().name(), env.getApiUrl(),
+//            env.getKeycloakUrl(), env.getUsername(), env.getPassword())
+//        .anyMatch(StringUtils::isBlank);
+//  }
 }
