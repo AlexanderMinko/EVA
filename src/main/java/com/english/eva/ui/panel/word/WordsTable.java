@@ -1,62 +1,97 @@
 package com.english.eva.ui.panel.word;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
-import com.english.eva.service.MeaningService;
+import com.english.eva.entity.LearningStatus;
+import com.english.eva.entity.Meaning;
+import com.english.eva.entity.PartOfSpeech;
+import com.english.eva.entity.Word;
 import com.english.eva.service.WordService;
 import com.english.eva.ui.panel.meaning.MeaningTree;
+import org.apache.commons.lang3.StringUtils;
 
 public class WordsTable extends JTable {
 
   private static WordService wordService;
+
   public static void setWordService(WordService wordService) {
     WordsTable.wordService = wordService;
   }
 
   private static final String[] COLUMNS = new String[] {
-      "ID", "Word", "Translation", "Frequency", "Levels", "Parts of speech", "Topic"
+      "ID", "Word", "Translation", "Frequency", "Progress", "Levels", "Parts of speech", "Topic"
   };
 
+  private DefaultTableModel tableModel;
+
   public WordsTable(MeaningTree meaningTree) {
-    setModel(new DefaultTableModel(getWordsData(), COLUMNS));
+    tableModel = new DefaultTableModel(getWordsData(), COLUMNS);
+    setModel(tableModel);
+
+    initColumnModel();
+
+    addMouseListener(new TableClickListener(this, meaningTree));
+    setDefaultRenderer(Object.class, new WordTableCellRenderer());
+    setDragEnabled(false);
+  }
+
+  private void initColumnModel() {
     getColumnModel().getColumn(0).setMinWidth(0);
     getColumnModel().getColumn(0).setMaxWidth(0);
     getColumnModel().getColumn(0).setResizable(false);
+    getColumnModel().getColumn(3).setMaxWidth(90);
+  }
 
-    getColumnModel().getColumn(1).setPreferredWidth(50);
-    getColumnModel().getColumn(2).setPreferredWidth(50);
-    getColumnModel().getColumn(3).setPreferredWidth(50);
+  public static final Map<Long, Integer> wordIdRowMap = new HashMap<>();
 
-    setShowHorizontalLines(true);
-    setShowVerticalLines(true);
-    setAutoCreateRowSorter(true);
-    getModel().addTableModelListener(event -> {
-      int row = event.getFirstRow();
-      int column = event.getColumn();
-      TableModel model = (TableModel) event.getSource();
-      String data = (String) model.getValueAt(row, column);
-      var columnName = model.getColumnName(column);
-      System.out.println(data);
-      System.out.println(columnName);
-      System.out.println("--------");
-    });
+  public void reloadTable() {
+    tableModel.setDataVector(getWordsData(), COLUMNS);
+    initColumnModel();
+  }
 
-    addMouseListener(new TableClickListener(this, meaningTree));
+  public void reloadTable(List<Word> words) {
+    tableModel.setDataVector(getWordsData(words), COLUMNS);
+    initColumnModel();
+  }
+
+  private String[][] getWordsData(List<Word> words) {
+    words.forEach(System.out::println);
+    return words.stream()
+        .map(word -> {
+          var levels = word.getMeaning().stream()
+              .map(Meaning::getProficiencyLevel)
+              .map(Enum::name)
+              .distinct().sorted(Comparator.naturalOrder()).collect(Collectors.joining(StringUtils.SPACE));
+          var partsOfSpeech = word.getMeaning().stream()
+              .map(Meaning::getPartOfSpeech)
+              .map(PartOfSpeech::getLabel)
+              .distinct().collect(Collectors.joining(","));
+          var knownCount = word.getMeaning().stream()
+              .filter(meaning -> meaning.getLearningStatus() == LearningStatus.KNOWN).count();
+          var progress = (int) (((double) knownCount / word.getMeaning().size()) * 100);
+          wordIdRowMap.put(word.getId(), 0); //TODO
+          return new String[] {
+              String.valueOf(word.getId()),
+              word.getText(),
+              "[ " + word.getTranscript() + " ]",
+              String.valueOf(word.getFrequency()),
+              String.valueOf(progress),
+              levels,
+              partsOfSpeech,
+              word.getTopic()
+          };
+        })
+        .toArray(String[][]::new);
   }
 
   private String[][] getWordsData() {
-    var words = wordService.getAll();
-    return words.stream()
-        .map(word -> new String[] {
-            String.valueOf(word.getId()),
-            word.getText(),
-            word.getTranscript(),
-            String.valueOf(word.getFrequency()),
-            word.getTopic()
-        })
-        .toArray(String[][]::new);
+    return getWordsData(wordService.getAll());
   }
 
   //  private static boolean isEmpty(EnvironmentInfo env) {

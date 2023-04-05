@@ -3,6 +3,7 @@ package com.english.eva.entity;
 import java.util.Date;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -53,6 +54,10 @@ public class Meaning {
   @Column(name = "meaning_source")
   private MeaningSource meaningSource;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "learning_status")
+  private LearningStatus learningStatus;
+
   @Column(name = "description")
   private String description;
 
@@ -74,7 +79,7 @@ public class Meaning {
   @LastModifiedDate
   private Date lastModified;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "word_id")
   private Word word;
 }

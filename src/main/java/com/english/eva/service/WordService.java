@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.english.eva.entity.Word;
+import com.english.eva.model.SearchParams;
 import com.english.eva.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,5 +40,16 @@ public class WordService {
       log.info("Founded word [{}] by id [{}]", word.getText(), id);
     }
     return word;
+  }
+
+  public void delete(Long id) {
+    wordRepository.deleteById(id);
+    log.info("Word with id [{}] successfully has been deleted", id);
+  }
+
+  public List<Word> search(SearchParams params) {
+    var result = wordRepository.findBySearchParams(params);
+    log.info("Founded [{}] search results", result.size());
+    return result;
   }
 }

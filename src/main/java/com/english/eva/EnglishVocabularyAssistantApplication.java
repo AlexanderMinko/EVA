@@ -55,7 +55,7 @@ public class EnglishVocabularyAssistantApplication {
   private static ApplicationContext initApplicationContext(String[] args) {
     return new SpringApplicationBuilder(EnglishVocabularyAssistantApplication.class)
         .headless(false)
-        .web(WebApplicationType.SERVLET)
+        .web(WebApplicationType.NONE)
         .run(args);
   }
 }

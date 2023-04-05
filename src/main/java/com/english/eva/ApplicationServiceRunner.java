@@ -3,6 +3,7 @@ package com.english.eva;
 import com.english.eva.service.MeaningService;
 import com.english.eva.service.WordService;
 import com.english.eva.ui.panel.meaning.MeaningTree;
+import com.english.eva.ui.panel.meaning.TreeClickListener;
 import com.english.eva.ui.panel.settings.SettingsPanel;
 import com.english.eva.ui.panel.word.TableClickListener;
 import com.english.eva.ui.panel.word.WordsTable;
@@ -27,5 +28,6 @@ public class ApplicationServiceRunner implements ApplicationRunner {
     TableClickListener.setMeaningService(meaningService);
     SettingsPanel.setWordService(wordService);
     MeaningTree.setMeaningService(meaningService);
+    TreeClickListener.setMeaningService(meaningService);
   }
 }

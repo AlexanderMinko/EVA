@@ -1,15 +1,13 @@
 package com.english.eva.ui.panel.meaning;
 
-import static com.english.eva.common.Constants.COLON;
-import static com.english.eva.common.Constants.COLON_SPACE;
+import static com.english.eva.ui.panel.util.ColorUtils.LEARNING_COLOURS;
+import static com.english.eva.ui.panel.util.ColorUtils.LEVEL_COLOURS;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,17 +20,6 @@ import javax.swing.tree.TreeCellRenderer;
 import com.english.eva.entity.ProficiencyLevel;
 
 public class MeaningTreeCellRenderer extends JPanel implements TreeCellRenderer {
-
-  private final static Map<String, Color> LEVEL_COLOURS = new HashMap<>();
-  static {
-    LEVEL_COLOURS.put(ProficiencyLevel.A1.name(), new Color(255, 128, 0));
-    LEVEL_COLOURS.put(ProficiencyLevel.A2.name(), new Color(0, 160, 160));
-    LEVEL_COLOURS.put(ProficiencyLevel.B1.name(), new Color(255, 0, 0));
-    LEVEL_COLOURS.put(ProficiencyLevel.B2.name(), new Color(0, 128, 64));
-    LEVEL_COLOURS.put(ProficiencyLevel.C1.name(), new Color(48, 96, 255));
-    LEVEL_COLOURS.put(ProficiencyLevel.C2.name(), new Color(160, 48, 160));
-    LEVEL_COLOURS.put(ProficiencyLevel.J7.name(), new Color(26, 27, 31));
-  }
 
   private final DefaultTreeCellRenderer defaultTreeCellRenderer = new DefaultTreeCellRenderer();
 
@@ -50,7 +37,7 @@ public class MeaningTreeCellRenderer extends JPanel implements TreeCellRenderer 
       boolean leaf,
       int row,
       boolean hasFocus) {
-    var renderer = defaultTreeCellRenderer.getTreeCellRendererComponent(
+    var renderer = (DefaultTreeCellRenderer) defaultTreeCellRenderer.getTreeCellRendererComponent(
         tree, value, selected, expanded, leaf, row, hasFocus);
     setBorder(new EmptyBorder(5, 5, 5, 5));
     final var keyField = new JLabel();
@@ -65,41 +52,18 @@ public class MeaningTreeCellRenderer extends JPanel implements TreeCellRenderer 
     var userObject = node.getUserObject();
     if (userObject instanceof String castedObject) {
       var isDesc = Arrays.stream(ProficiencyLevel.values()).map(Enum::name).anyMatch(castedObject::startsWith);
-      if (castedObject.contains(COLON)) {
-        var parts = castedObject.split(COLON);
-        keyField.setText(parts[0].strip() + COLON_SPACE);
-        keyField.setFont(new Font(font.getName(), Font.ITALIC, font.getSize() - 1));
-        valueField.setText(parts[1].strip());
-        valueField.setFont(new Font(font.getName(), font.getStyle(), font.getSize()));
-      } else if (castedObject.contains("][]][]")) {
-        
+      if (castedObject.contains("$")) {
+        handleTargetLearningCase(keyField, valueField, font, castedObject);
       } else if (isDesc) {
-        var parts = castedObject.split("=");
-        var level = parts[0].strip();
-        keyField.setText(level);
-        keyField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
-        keyField.setOpaque(true);
-        keyField.setBorder(new EmptyBorder(0, 10, 0, 10));
-        keyField.setBackground(LEVEL_COLOURS.get(level));
-        keyField.setForeground(new Color(255, 255, 255));
-        valueField.setText(" " + parts[1].strip());
-        valueField.setFont(new Font(font.getName(), font.getStyle(), font.getSize()));
+        handleProficiencyDescriptionCase(keyField, valueField, font, castedObject);
       } else if (leaf) {
-        keyField.setText(castedObject);
-        keyField.setFont(new Font(font.getName(), font.getStyle(), font.getSize()));
-        valueField.setText(null);
+        handleLeafCase(keyField, valueField, font, castedObject);
       } else if (castedObject.equals("Examples")) {
-        keyField.setText(castedObject);
-        keyField.setFont(new Font(font.getName(), Font.BOLD, font.getSize() - 1));
-        valueField.setText(null);
+        handleExamplesCase(keyField, valueField, font, castedObject);
       } else if (isTargetRow) {
-        keyField.setText(castedObject);
-        keyField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
-        valueField.setText(null);
-      }  else {
-        keyField.setText(castedObject);
-        keyField.setFont(font);
-        valueField.setText(null);
+        handleTargetRowCase(keyField, valueField, font, castedObject);
+      } else {
+        handleDefaultCase(keyField, valueField, font, castedObject);
       }
     } else {
       return renderer;
@@ -109,4 +73,84 @@ public class MeaningTreeCellRenderer extends JPanel implements TreeCellRenderer 
     add(valueField, BorderLayout.CENTER);
     return this;
   }
+
+  private static void handleTargetLearningCase(JLabel keyField, JLabel valueField, Font font, String castedObject) {
+    var parts = castedObject.split("\\$");
+    var learningStatus = parts[0].strip();
+    var target = parts[1].strip();
+
+    keyField.setText(target + " ");
+    keyField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+
+    valueField.setText(learningStatus);
+    valueField.setOpaque(true);
+    valueField.setBackground(LEARNING_COLOURS.get(learningStatus));
+    valueField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+    valueField.setBorder(new EmptyBorder(3, 3, 3, 3));
+  }
+
+  private static void handleDefaultCase(JLabel keyField, JLabel valueField, Font font, String castedObject) {
+    keyField.setText(castedObject);
+    keyField.setFont(font);
+    valueField.setText(null);
+  }
+
+  private static void handleTargetRowCase(JLabel keyField, JLabel valueField, Font font, String castedObject) {
+    keyField.setText(castedObject);
+    keyField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+    valueField.setText(null);
+  }
+
+  private static void handleExamplesCase(JLabel keyField, JLabel valueField, Font font, String castedObject) {
+    keyField.setText(castedObject);
+    keyField.setFont(new Font(font.getName(), Font.ITALIC, font.getSize() - 1));
+    valueField.setText(null);
+  }
+
+  private static void handleLeafCase(JLabel keyField, JLabel valueField, Font font, String castedObject) {
+    keyField.setText(castedObject);
+    keyField.setFont(new Font(font.getName(), font.getStyle(), font.getSize()));
+    valueField.setText(null);
+  }
+
+  private static void handleProficiencyDescriptionCase(
+      JLabel keyField,
+      JLabel valueField,
+      Font font,
+      String castedObject) {
+    var parts = castedObject.split("=");
+    var level = parts[0].strip();
+    keyField.setText(level);
+    keyField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+    keyField.setOpaque(true);
+    keyField.setBorder(new EmptyBorder(0, 10, 0, 10));
+    keyField.setBackground(LEVEL_COLOURS.get(level));
+    keyField.setForeground(new Color(255, 255, 255));
+    valueField.setText(" " + parts[1].strip());
+    valueField.setFont(new Font(font.getName(), font.getStyle(), font.getSize()));
+  }
+
+//  private void handleTargetLearningCase(JLabel keyField, JLabel valueField, Font font, String castedObject) {
+//    var parts = castedObject.split("\\$");
+//    var learningStatus = parts[0].strip();
+//    var target = parts[1].strip();
+//
+//    keyField.setText(target + " ");
+//    keyField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+//
+//    valueField.setText(learningStatus);
+//    valueField.setOpaque(true);
+//    valueField.setBackground(LEANING_COLOURS.get(learningStatus));
+//    valueField.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+//    valueField.setBorder(new EmptyBorder(3, 3, 3, 3));
+//
+//  }
+
+//  private static <T> JComboBox<T> addComboBoxFieldEnums(JPanel envPanel, T[] values, String labelText) {
+//    var enums = new JComboBox<>(values);
+//    var label = new JLabel(labelText);
+//    envPanel.add(label, String.format("cell 0 %s", INIT_Y_CELL += 1));
+//    envPanel.add(enums, String.format("cell 1 %s", INIT_Y_CELL));
+//    return enums;
+//  }
 }

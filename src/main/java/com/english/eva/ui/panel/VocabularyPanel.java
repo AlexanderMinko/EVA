@@ -24,21 +24,21 @@ public class VocabularyPanel extends AbstractPanel implements ActionPanel {
     if (isComponentLoaded) {
       return;
     }
-    initSplitPane();
-    add(new SettingsPanel(), "cell 0 0, pushx");
-    add(mainSplitPane, "cell 0 1, push, grow");
-    isComponentLoaded = true;
-  }
-
-  private void initSplitPane() {
     mainSplitPane = new JSplitPane();
     mainSplitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
     mainSplitPane.setResizeWeight(0.3);
 
     var meaningTree = new MeaningTree();
     var wordsTable = new WordsTable(meaningTree);
+    meaningTree.setWordsTable(wordsTable);
     mainSplitPane.setLeftComponent(new JScrollPane(wordsTable));
     mainSplitPane.setRightComponent(new JScrollPane(meaningTree));
+
+    var settingsPanel = new SettingsPanel();
+    settingsPanel.setWordsTable(wordsTable);
+    add(settingsPanel, "cell 0 0, pushx");
+    add(mainSplitPane, "cell 0 1, push, grow");
+    isComponentLoaded = true;
   }
 
 }

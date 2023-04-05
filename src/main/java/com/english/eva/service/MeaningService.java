@@ -2,6 +2,7 @@ package com.english.eva.service;
 
 import java.util.List;
 
+import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.Meaning;
 import com.english.eva.entity.MeaningSource;
 import com.english.eva.repository.MeaningRepository;
@@ -24,6 +25,12 @@ public class MeaningService {
             " description=[{}], examples=[{}]",
         saved.getId(), saved.getMeaningSource().getLabel(), saved.getPartOfSpeech().getLabel(),
         saved.getProficiencyLevel(), saved.getDescription(), saved.getExamples());
+  }
+
+  public void updateLearningStatus(Long id, LearningStatus learningStatus) {
+    meaningRepository.updateLearningStatus(id, learningStatus);
+    log.info("Learning status has been successfully updated for meaning with id [{}]. New learning status is [{}]",
+        id, learningStatus);
   }
 
   public Meaning getMeaning(Long id) {
