@@ -47,6 +47,8 @@ public class SettingsPanel extends JPanel {
   private JPanel levelsPanel;
   private JButton searchButton;
 
+  private List<JToggleButton> learningStatusButtonList;
+
   public SettingsPanel() {
     //search
     setBorder(new TitledBorder("Settings"));
@@ -60,23 +62,24 @@ public class SettingsPanel extends JPanel {
     initLevelsBar();
 
     var toggleButtonKnown = new JToggleButton(LearningStatus.KNOWN.getLabel());
+    var toggleButtonLearnt = new JToggleButton(LearningStatus.LEARNT.getLabel());
     var toggleButtonLearning = new JToggleButton(LearningStatus.LEARNING.getLabel());
     var toggleButtonPutOff = new JToggleButton(LearningStatus.PUT_OFF.getLabel());
     var toggleButtonAllLearningStatuses = new JToggleButton("Select All");
-    var learningStatusButtonList = List.of(toggleButtonKnown, toggleButtonLearning, toggleButtonPutOff);
+    learningStatusButtonList = List.of(toggleButtonKnown, toggleButtonLearnt, toggleButtonLearning, toggleButtonPutOff);
     learningStatusButtonList.forEach(toggle -> {
       toggle.setBackground(LEARNING_COLOURS.get(toggle.getText()));
       var font = toggle.getFont();
       toggle.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
       toggle.addActionListener(event -> {
-        toggle.setBackground(toggle.isSelected() ? Color.WHITE : LEARNING_COLOURS.get(toggle.getText()));
+        toggle.setBackground(toggle.isSelected() ? new Color(0, 0, 0, 0) : LEARNING_COLOURS.get(toggle.getText()));
       });
     });
     toggleButtonAllLearningStatuses.addActionListener(event -> {
       learningStatusButtonList.forEach(levelButton -> {
         levelButton.setSelected(toggleButtonAllLearningStatuses.isSelected());
         if (levelButton.isSelected()) {
-          levelButton.setBackground(Color.WHITE);
+          levelButton.setBackground(new Color(0, 0, 0, 0));
         } else {
           levelButton.setBackground(LEARNING_COLOURS.get(levelButton.getText()));
         }
@@ -125,7 +128,7 @@ public class SettingsPanel extends JPanel {
       levelButton.addActionListener(e -> {
         levelButton.setForeground(Color.WHITE);
         if (levelButton.isSelected()) {
-          levelButton.setBackground(Color.WHITE);
+          levelButton.setBackground(new Color(0, 0, 0, 0));
         } else {
           levelButton.setBackground(LEVEL_COLOURS.get(levelButton.getText()));
         }
@@ -138,7 +141,7 @@ public class SettingsPanel extends JPanel {
       levelButtonsList.forEach(levelButton -> {
         levelButton.setSelected(selected);
         if (levelButton.isSelected()) {
-          levelButton.setBackground(Color.WHITE);
+          levelButton.setBackground(new Color(0, 0, 0, 0));
         } else {
           levelButton.setBackground(LEVEL_COLOURS.get(levelButton.getText()));
         }
@@ -187,6 +190,12 @@ public class SettingsPanel extends JPanel {
         .map(ProficiencyLevel::valueOf)
         .toList();
     searchParams.levels(selectedLevels);
+    var selectedLearningStatuses = learningStatusButtonList.stream()
+        .filter(AbstractButton::isSelected)
+        .map(AbstractButton::getText)
+        .map(LearningStatus::findByLabel)
+        .toList();
+    searchParams.statuses(selectedLearningStatuses);
     var searchResult = wordService.search(searchParams.build());
     wordsTable.reloadTable(searchResult);
   }

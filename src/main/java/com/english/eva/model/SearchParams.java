@@ -2,6 +2,7 @@ package com.english.eva.model;
 
 import java.util.List;
 
+import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.ProficiencyLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -11,4 +12,5 @@ import lombok.Data;
 public class SearchParams {
   private String searchKey;
   private List<ProficiencyLevel> levels;
+  private List<LearningStatus> statuses;
 }

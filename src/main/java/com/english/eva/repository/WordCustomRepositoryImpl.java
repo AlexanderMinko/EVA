@@ -38,6 +38,13 @@ public class WordCustomRepositoryImpl implements WordCustomRepository {
       predicates.add(predicate);
     }
 
+    var statuses = params.getStatuses();
+    if(CollectionUtils.isNotEmpty(statuses)) {
+      var join = rootItem.join("meaning");
+      var predicate = builder.in(join.get("learningStatus")).value(statuses);
+      predicates.add(predicate);
+    }
+
     criteria.distinct(true).where(predicates.toArray(Predicate[]::new));
     return entityManager.createQuery(criteria).getResultList();
   }

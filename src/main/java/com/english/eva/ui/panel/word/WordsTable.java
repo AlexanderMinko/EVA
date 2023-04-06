@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.Meaning;
@@ -28,9 +30,11 @@ public class WordsTable extends JTable {
       "ID", "Word", "Translation", "Frequency", "Progress", "Levels", "Parts of speech", "Topic"
   };
 
-  private DefaultTableModel tableModel;
+  private final DefaultTableModel tableModel;
+  private List<Word> words;
 
   public WordsTable(MeaningTree meaningTree) {
+    words = wordService.getAll();
     tableModel = new DefaultTableModel(getWordsData(), COLUMNS);
     setModel(tableModel);
 
@@ -38,7 +42,13 @@ public class WordsTable extends JTable {
 
     addMouseListener(new TableClickListener(this, meaningTree));
     setDefaultRenderer(Object.class, new WordTableCellRenderer());
-    setDragEnabled(false);
+    setAutoCreateRowSorter(true);
+    var sorter = (TableRowSorter<TableModel>) getRowSorter();
+    sorter.setComparator(3, (o1, o2) -> {
+      Integer freq1 = Integer.parseInt((String) o1);
+      Integer freq2 = Integer.parseInt((String) o2);
+      return freq1.compareTo(freq2);
+    });
   }
 
   private void initColumnModel() {
@@ -48,20 +58,20 @@ public class WordsTable extends JTable {
     getColumnModel().getColumn(3).setMaxWidth(90);
   }
 
-  public static final Map<Long, Integer> wordIdRowMap = new HashMap<>();
-
   public void reloadTable() {
+    var wordsIds = words.stream().map(Word::getId).collect(Collectors.toSet());
+    this.words = wordService.getByWordIds(wordsIds);
     tableModel.setDataVector(getWordsData(), COLUMNS);
     initColumnModel();
   }
 
   public void reloadTable(List<Word> words) {
-    tableModel.setDataVector(getWordsData(words), COLUMNS);
+    this.words = words;
+    tableModel.setDataVector(getWordsData(), COLUMNS);
     initColumnModel();
   }
 
-  private String[][] getWordsData(List<Word> words) {
-    words.forEach(System.out::println);
+  private String[][] getWordsData() {
     return words.stream()
         .map(word -> {
           var levels = word.getMeaning().stream()
@@ -73,9 +83,9 @@ public class WordsTable extends JTable {
               .map(PartOfSpeech::getLabel)
               .distinct().collect(Collectors.joining(","));
           var knownCount = word.getMeaning().stream()
-              .filter(meaning -> meaning.getLearningStatus() == LearningStatus.KNOWN).count();
+              .filter(meaning -> meaning.getLearningStatus() == LearningStatus.KNOWN ||
+                  meaning.getLearningStatus() == LearningStatus.LEARNT).count();
           var progress = (int) (((double) knownCount / word.getMeaning().size()) * 100);
-          wordIdRowMap.put(word.getId(), 0); //TODO
           return new String[] {
               String.valueOf(word.getId()),
               word.getText(),
@@ -90,9 +100,9 @@ public class WordsTable extends JTable {
         .toArray(String[][]::new);
   }
 
-  private String[][] getWordsData() {
-    return getWordsData(wordService.getAll());
-  }
+//  private String[][] getWordsData() {
+//    return getWordsData(wordService.getAll());
+//  }
 
   //  private static boolean isEmpty(EnvironmentInfo env) {
 //    return Stream.of(

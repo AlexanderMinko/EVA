@@ -2,6 +2,7 @@ package com.english.eva.ui.panel.meaning;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.Objects;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -44,15 +45,11 @@ public class TreeClickListener extends MouseAdapter {
     if (node.getUserObject() instanceof String targetLearning && (targetLearning.contains("$"))) {
       var id = Long.parseLong(targetLearning.split("\\$")[2]);
       var popupMenu = new JPopupMenu();
-      var markKnownItem = new JMenuItem("Mark known");
-      markKnownItem.addActionListener(knownEvent -> handleLearningUpdate(id, LearningStatus.KNOWN));
-      var markLearningItem = new JMenuItem("Mark Learning");
-      markLearningItem.addActionListener(knownEvent -> handleLearningUpdate(id, LearningStatus.LEARNING));
-      var markPutOffItem = new JMenuItem("Mark put off");
-      markPutOffItem.addActionListener(knownEvent -> handleLearningUpdate(id, LearningStatus.PUT_OFF));
-      popupMenu.add(markKnownItem);
-      popupMenu.add(markLearningItem);
-      popupMenu.add(markPutOffItem);
+      Arrays.stream(LearningStatus.values())
+          .map(status -> new JMenuItem(status.getLabel()))
+          .peek(menuItem -> menuItem.addActionListener(
+              menuEvent -> handleLearningUpdate(id, LearningStatus.findByLabel(menuItem.getText()))))
+          .forEach(popupMenu::add);
       popupMenu.show(event.getComponent(), event.getX(), event.getY());
     }
   }
@@ -64,6 +61,6 @@ public class TreeClickListener extends MouseAdapter {
   }
 
   private void reloadTree() {
-   meaningTree.showSelectedUserObjectTree();
+    meaningTree.showSelectedUserObjectTree();
   }
 }

@@ -6,11 +6,13 @@ import java.util.Map;
 
 import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.ProficiencyLevel;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class ColorUtils {
 
-  public final static Map<String, Color> LEVEL_COLOURS = new HashMap<>();
-  public final static Map<String, Color> LEARNING_COLOURS = new HashMap<>();
+  public static final Map<String, Color> LEVEL_COLOURS = new HashMap<>();
+  public static final Map<String, Color> LEARNING_COLOURS = new HashMap<>();
 
   static {
     LEVEL_COLOURS.put(ProficiencyLevel.A1.name(), new Color(255, 128, 0));
@@ -26,6 +28,7 @@ public class ColorUtils {
     LEARNING_COLOURS.put(LearningStatus.KNOWN.getLabel(), new Color(156, 255, 205));
     LEARNING_COLOURS.put(LearningStatus.LEARNING.getLabel(), new Color(255, 189, 128));
     LEARNING_COLOURS.put(LearningStatus.PUT_OFF.getLabel(), new Color(184, 148, 197));
+    LEARNING_COLOURS.put(LearningStatus.LEARNT.getLabel(), new Color(85, 173, 129));
   }
 
 }

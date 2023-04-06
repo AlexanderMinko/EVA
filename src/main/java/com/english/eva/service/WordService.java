@@ -1,13 +1,34 @@
 package com.english.eva.service;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
+import com.english.eva.entity.Meaning;
 import com.english.eva.entity.Word;
 import com.english.eva.model.SearchParams;
 import com.english.eva.repository.WordRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +63,10 @@ public class WordService {
     return word;
   }
 
+  public List<Word> getByWordIds(Set<Long> ids) {
+    return wordRepository.findByIdIn(ids);
+  }
+
   public void delete(Long id) {
     wordRepository.deleteById(id);
     log.info("Word with id [{}] successfully has been deleted", id);
@@ -52,4 +77,40 @@ public class WordService {
     log.info("Founded [{}] search results", result.size());
     return result;
   }
+
+  public void saveReserve() {
+    var mapper = new ObjectMapper();
+    var data = wordRepository.findAll();
+    var path = Paths.get(System.getProperty("user.home") + "/English/words.json");
+    try {
+      Files.write(path, mapper.writeValueAsBytes(data));
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      throw new RuntimeException(e);
+    }
+    log.info("Words have been saved to JSON. Path: [{}]", path);
+  }
+
+//  @Data
+//  static class WordDto implements Serializable {
+//    private Long id;
+//    private String text;
+//    private String transcript;
+//    private Integer frequency;
+//    private String topic;
+//    private Date dateCreated;
+//    private Date lastModified;
+//    private List<Meaning> meanings;
+//
+//    public WordDto(Word word) {
+//      this.id = word.getId();
+//      this.text = word.getText();
+//      this.transcript = word.getTranscript();
+//      this.frequency = word.getFrequency();
+//      this.topic = word.getTopic();
+//      this.dateCreated = word.getDateCreated();
+//      this.lastModified = word.getLastModified();
+//      this.meanings = word.getMeaning();
+//    }
+//  }
 }

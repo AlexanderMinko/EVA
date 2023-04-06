@@ -6,15 +6,22 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import com.english.eva.entity.Meaning;
+import com.english.eva.service.MeaningService;
+import com.english.eva.service.WordService;
 import com.english.eva.ui.frame.ApplicationFrame;
 import com.english.eva.ui.panel.VocabularyPanel;
 import com.formdev.flatlaf.FlatLightLaf;
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.jdesktop.swingx.JXBusyLabel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 
+@Slf4j
 @SpringBootApplication
 public class EnglishVocabularyAssistantApplication {
 
@@ -58,4 +65,18 @@ public class EnglishVocabularyAssistantApplication {
         .web(WebApplicationType.NONE)
         .run(args);
   }
+
+//  @Autowired
+//  private WordService wordService;
+//
+//  @Autowired
+//  private MeaningService meaningService;
+//
+//  @PreDestroy
+//  public void onExit() {
+//    log.info("###STOPing###");
+//    wordService.saveReserve();
+//    log.info("###STOP FROM THE LIFECYCLE###");
+//  }
+
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 public enum LearningStatus {
 
   KNOWN("Known"),
+  LEARNT("Learnt"),
   LEARNING("Learning"),
   PUT_OFF("Put off");
 
