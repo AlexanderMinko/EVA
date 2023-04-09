@@ -1,6 +1,7 @@
 spring:
   datasource:
-    url: jdbc:h2:file:./data/eva
+    url: jdbc:h2:file:/home/ming/English/eva/eva
+#    url: jdbc:h2:file:./data/eva
     username: sa
     password: password
     driverClassName: org.h2.Driver

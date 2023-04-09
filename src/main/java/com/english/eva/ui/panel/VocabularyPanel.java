@@ -6,7 +6,7 @@ import javax.swing.JSplitPane;
 
 import com.english.eva.ui.panel.meaning.MeaningTree;
 import com.english.eva.ui.panel.settings.SettingsPanel;
-import com.english.eva.ui.panel.word.WordsTable;
+import com.english.eva.ui.panel.word.WordsTableNew;
 import net.miginfocom.swing.MigLayout;
 
 public class VocabularyPanel extends AbstractPanel implements ActionPanel {
@@ -29,7 +29,7 @@ public class VocabularyPanel extends AbstractPanel implements ActionPanel {
     mainSplitPane.setResizeWeight(0.3);
 
     var meaningTree = new MeaningTree();
-    var wordsTable = new WordsTable(meaningTree);
+    var wordsTable = new WordsTableNew(meaningTree);
     meaningTree.setWordsTable(wordsTable);
     mainSplitPane.setLeftComponent(new JScrollPane(wordsTable));
     mainSplitPane.setRightComponent(new JScrollPane(meaningTree));

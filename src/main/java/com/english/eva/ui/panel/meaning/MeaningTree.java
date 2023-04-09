@@ -12,14 +12,14 @@ import com.english.eva.entity.MeaningSource;
 import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.entity.Word;
 import com.english.eva.service.MeaningService;
-import com.english.eva.ui.panel.word.WordsTable;
+import com.english.eva.ui.panel.word.WordsTableNew;
 import org.apache.commons.collections4.CollectionUtils;
 
 public class MeaningTree extends JTree {
 
   private static MeaningService meaningService;
   private Word word;
-  private WordsTable wordsTable;
+  private WordsTableNew wordsTable;
 
   public static void setMeaningService(MeaningService meaningService) {
     MeaningTree.meaningService = meaningService;
@@ -105,7 +105,7 @@ public class MeaningTree extends JTree {
     this.word = word;
   }
 
-  public void setWordsTable(WordsTable wordsTable) {
+  public void setWordsTable(WordsTableNew wordsTable) {
     addMouseListener(new TreeClickListener(this, wordsTable));
     this.wordsTable = wordsTable;
   }

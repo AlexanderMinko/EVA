@@ -127,7 +127,7 @@ public class MeaningTreeCellRenderer extends JPanel implements TreeCellRenderer 
     keyField.setBackground(LEVEL_COLOURS.get(level));
     keyField.setForeground(new Color(255, 255, 255));
     valueField.setText(" " + parts[1].strip());
-    valueField.setFont(new Font(font.getName(), font.getStyle(), font.getSize()));
+    valueField.setFont(new Font(font.getName(), font.getStyle(), font.getSize() + 2));
   }
 
 //  private void handleTargetLearningCase(JLabel keyField, JLabel valueField, Font font, String castedObject) {

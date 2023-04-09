@@ -1,34 +1,18 @@
 package com.english.eva.service;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.english.eva.entity.Meaning;
 import com.english.eva.entity.Word;
 import com.english.eva.model.SearchParams;
 import com.english.eva.repository.WordRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,10 +24,11 @@ public class WordService {
 
   private final WordRepository wordRepository;
 
-  public void save(Word word) {
+  public Word save(Word word) {
     var saved = wordRepository.save(word);
     log.info("Word successfully has been saved. Id=[{}], word=[{}], transcript=[{}], frequency=[{}], topic=[{}]",
         saved.getId(), saved.getText(), saved.getTranscript(), saved.getFrequency(), saved.getTopic());
+    return saved;
   }
 
   public List<Word> getAll() {

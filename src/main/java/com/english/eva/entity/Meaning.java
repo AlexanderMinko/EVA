@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -24,7 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Fetch;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -59,10 +57,10 @@ public class Meaning {
   @Column(name = "learning_status")
   private LearningStatus learningStatus;
 
-  @Column(name = "description")
+  @Column(name = "description", length = 1024)
   private String description;
 
-  @Column(name = "example")
+  @Column(name = "example", length = 1024)
   @ElementCollection
   @CollectionTable(name = "examples", joinColumns = @JoinColumn(name = "meaning_id"))
   private List<String> examples;
@@ -81,7 +79,7 @@ public class Meaning {
   private Date lastModified;
 
   @JsonIgnore
-  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "word_id")
   private Word word;
 }

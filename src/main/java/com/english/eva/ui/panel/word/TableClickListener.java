@@ -2,6 +2,7 @@ package com.english.eva.ui.panel.word;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
@@ -35,10 +36,10 @@ public class TableClickListener extends MouseAdapter {
   private static MeaningService meaningService;
 
   private static Integer INIT_Y_CELL = -1;
-  private final WordsTable wordsTable;
+  private final WordsTableNew wordsTable;
   private final MeaningTree meaningTree;
 
-  public TableClickListener(WordsTable wordsTable, MeaningTree meaningTree) {
+  public TableClickListener(WordsTableNew wordsTable, MeaningTree meaningTree) {
     this.wordsTable = wordsTable;
     this.meaningTree = meaningTree;
   }
@@ -49,7 +50,7 @@ public class TableClickListener extends MouseAdapter {
     var point = event.getPoint();
     var currentRow = wordsTable.rowAtPoint(point);
     wordsTable.setRowSelectionInterval(currentRow, currentRow);
-    var selectedWordId = Long.parseLong((String) wordsTable.getModel().getValueAt(currentRow, 0));
+    var selectedWordId = (Long) wordsTable.getModel().getValueAt(currentRow, WordTableModel.HIDDEN_WORD_ID);
     if (SwingUtilities.isRightMouseButton(event)) {
       showWordPopupMenu(event, selectedWordId);
     }
@@ -65,17 +66,15 @@ public class TableClickListener extends MouseAdapter {
 
     var addNewWordItem = new JMenuItem("Add new word");
     addNewWordItem.addActionListener(event -> handleAddNewWordItem());
-    popupMenu.add(addNewWordItem);
-    popupMenu.addSeparator();
-
     var addMeaningItem = new JMenuItem("Add meaning");
     addMeaningItem.addActionListener(event -> handleAddMeaningItem(selectedWordId));
-    popupMenu.add(addMeaningItem);
-
     var deleteWordItem = new JMenuItem("Delete word");
     deleteWordItem.addActionListener(event -> handleDeleteWordItem());
-    popupMenu.add(deleteWordItem);
 
+    popupMenu.add(addMeaningItem);
+    popupMenu.add(addNewWordItem);
+    popupMenu.addSeparator();
+    popupMenu.add(deleteWordItem);
     popupMenu.show(e.getComponent(), e.getX(), e.getY());
   }
 
@@ -105,15 +104,16 @@ public class TableClickListener extends MouseAdapter {
     if (option == JOptionPane.OK_OPTION) {
       var dateCreated = new Date();
       var word = Word.builder()
-          .text(textField.getText())
-          .transcript(transcriptField.getText())
-          .frequency(Integer.parseInt(frequencyField.getText()))
-          .topic(topicField.getText())
+          .text(textField.getText().strip())
+          .transcript(transcriptField.getText().strip())
+          .frequency(Integer.parseInt(frequencyField.getText().strip()))
+          .topic(topicField.getText().strip())
           .dateCreated(dateCreated)
           .lastModified(dateCreated)
           .build();
-      wordService.save(word);
-      wordsTable.reloadTable();
+      var saved = wordService.save(word);
+      saved.setMeaning(new ArrayList<>());
+      wordsTable.reloadTable(saved);
     }
   }
 

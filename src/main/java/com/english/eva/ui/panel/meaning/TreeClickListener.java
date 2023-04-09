@@ -11,7 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.english.eva.entity.LearningStatus;
 import com.english.eva.service.MeaningService;
-import com.english.eva.ui.panel.word.WordsTable;
+import com.english.eva.ui.panel.word.WordsTableNew;
 
 public class TreeClickListener extends MouseAdapter {
 
@@ -22,9 +22,9 @@ public class TreeClickListener extends MouseAdapter {
   }
 
   private final MeaningTree meaningTree;
-  private final WordsTable wordsTable;
+  private final WordsTableNew wordsTable;
 
-  public TreeClickListener(MeaningTree meaningTree, WordsTable wordsTable) {
+  public TreeClickListener(MeaningTree meaningTree, WordsTableNew wordsTable) {
     this.meaningTree = meaningTree;
     this.wordsTable = wordsTable;
   }

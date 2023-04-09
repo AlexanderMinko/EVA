@@ -11,7 +11,7 @@ public enum PartOfSpeech {
   MODAL_VERB("Modal verb"),
   NOUN("Noun"),
   PHRASAL_VERB("Phrasal verb"),
-  PHASE("Phase"),
+  PHASE("Phrase"),
   PREPOSITION("Preposition"),
   PRONOUN("Pronoun"),
   VERB("Verb");

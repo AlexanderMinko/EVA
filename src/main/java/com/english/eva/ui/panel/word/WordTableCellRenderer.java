@@ -8,8 +8,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -22,7 +20,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import com.english.eva.entity.ProficiencyLevel;
+import org.apache.commons.lang3.StringUtils;
 
 public class WordTableCellRenderer extends JPanel implements TableCellRenderer {
 
@@ -47,15 +45,16 @@ public class WordTableCellRenderer extends JPanel implements TableCellRenderer {
     setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, table.getGridColor()));
     var font = renderer.getFont();
     var label = new JLabel();
-    var stringValue = (String) value;
+    var stringValue = String.valueOf(value);
     if (Objects.isNull(stringValue)) {
       return this;
     }
     label.setText(stringValue);
     removeAll();
-    if (column == 1) {
+    if (column == WordTableModel.COLUMN_WORD) {
       label.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
-    } else if (column == 4) {
+      label.setText(" " + stringValue);
+    } else if (column == WordTableModel.COLUMN_PROGRESS) {
       var progressBar = new JProgressBar();
       progressBar.setValue(Integer.parseInt(stringValue));
       progressBar.setStringPainted(true);
@@ -64,11 +63,10 @@ public class WordTableCellRenderer extends JPanel implements TableCellRenderer {
       add(progressBar);
       return this;
     }
-    var isLevel = Arrays.stream(ProficiencyLevel.values()).map(Enum::name).anyMatch(stringValue::startsWith);
-    if (isLevel) {
+    if (column == WordTableModel.COLUMN_LEVELS) {
       var gridBadLayout = new BoxLayout(this, BoxLayout.X_AXIS);
       setLayout(gridBadLayout);
-      var levels = Arrays.stream(stringValue.split(" ")).toList();
+      var levels = Arrays.stream(stringValue.split(StringUtils.SPACE)).toList();
       for (String level : levels) {
         var levelLabel = new JLabel();
         levelLabel.setLayout(new BorderLayout());

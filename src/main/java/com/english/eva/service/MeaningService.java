@@ -1,11 +1,7 @@
 package com.english.eva.service;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.english.eva.entity.LearningStatus;
@@ -13,30 +9,10 @@ import com.english.eva.entity.Meaning;
 import com.english.eva.entity.MeaningSource;
 import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.entity.ProficiencyLevel;
-import com.english.eva.entity.Word;
 import com.english.eva.repository.MeaningRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,14 +30,12 @@ public class MeaningService {
             " description=[{}], examples=[{}]",
         saved.getId(), saved.getMeaningSource().getLabel(), saved.getPartOfSpeech().getLabel(),
         saved.getProficiencyLevel(), saved.getDescription(), saved.getExamples());
-    saveReserve();
   }
 
   public void updateLearningStatus(Long id, LearningStatus learningStatus) {
     meaningRepository.updateLearningStatus(id, learningStatus);
     log.info("Learning status has been successfully updated for meaning with id [{}]. New learning status is [{}]",
         id, learningStatus);
-    saveReserve();
   }
 
   public Meaning getMeaning(Long id) {
@@ -70,18 +44,18 @@ public class MeaningService {
     return meaning;
   }
 
-  public void saveReserve() {
-    var mapper = new ObjectMapper();
-    var data = meaningRepository.findAll().stream().map(MeaningDto::new).toList();
-    var path = Paths.get(System.getProperty("user.home") + "/English/meanings.json");
-    try {
-      Files.write(path, mapper.writeValueAsBytes(data));
-    } catch (IOException e) {
-      log.error(e.getMessage());
-      throw new RuntimeException(e);
-    }
-    log.info("Meanings have been saved to JSON. Path: [{}]", path);
-  }
+//  public void saveReserve() {
+//    var mapper = new ObjectMapper();
+//    var data = meaningRepository.findAll().stream().map(MeaningDto::new).toList();
+//    var path = Paths.get(System.getProperty("user.home") + "/English/meanings.json");
+//    try {
+//      Files.write(path, mapper.writeValueAsBytes(data));
+//    } catch (IOException e) {
+//      log.error(e.getMessage());
+//      throw new RuntimeException(e);
+//    }
+//    log.info("Meanings have been saved to JSON. Path: [{}]", path);
+//  }
 
   @Data
   class MeaningDto implements Serializable {

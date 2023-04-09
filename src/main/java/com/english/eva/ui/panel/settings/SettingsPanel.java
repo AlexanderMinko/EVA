@@ -2,7 +2,6 @@ package com.english.eva.ui.panel.settings;
 
 import static javax.swing.GroupLayout.Alignment.BASELINE;
 import static javax.swing.GroupLayout.Alignment.LEADING;
-import static javax.swing.GroupLayout.Alignment.TRAILING;
 
 import static com.english.eva.ui.panel.util.ColorUtils.LEARNING_COLOURS;
 import static com.english.eva.ui.panel.util.ColorUtils.LEVEL_COLOURS;
@@ -27,12 +26,12 @@ import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.ProficiencyLevel;
 import com.english.eva.model.SearchParams;
 import com.english.eva.service.WordService;
-import com.english.eva.ui.panel.word.WordsTable;
+import com.english.eva.ui.panel.word.WordsTableNew;
 
 public class SettingsPanel extends JPanel {
 
   private static WordService wordService;
-  private WordsTable wordsTable;
+  private WordsTableNew wordsTable;
 
   private JTextField wordSearchValueField;
   private JToggleButton toggleButtonA1;
@@ -200,7 +199,7 @@ public class SettingsPanel extends JPanel {
     wordsTable.reloadTable(searchResult);
   }
 
-  public void setWordsTable(WordsTable wordsTable) {
+  public void setWordsTable(WordsTableNew wordsTable) {
     this.wordsTable = wordsTable;
   }
 
