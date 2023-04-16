@@ -1,5 +1,7 @@
 package com.english.eva.ui.panel.word;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import com.english.eva.entity.LearningStatus;
@@ -57,7 +60,7 @@ public class TableClickListener extends MouseAdapter {
     if (SwingUtilities.isLeftMouseButton(event)) {
       var selectedWord = wordService.getById(selectedWordId);
       meaningTree.setWord(selectedWord);
-      meaningTree.showSelectedUserObjectTree();
+      SwingUtilities.invokeLater(meaningTree::showSelectedUserObjectTree);
     }
   }
 
@@ -68,24 +71,42 @@ public class TableClickListener extends MouseAdapter {
     addNewWordItem.addActionListener(event -> handleAddNewWordItem());
     var addMeaningItem = new JMenuItem("Add meaning");
     addMeaningItem.addActionListener(event -> handleAddMeaningItem(selectedWordId));
+    var addMeaningItemExperimental = new JMenuItem("Add meaning exp");
+    addMeaningItemExperimental.addActionListener(event -> new ExperimentalHandler(meaningTree)
+        .handleAddMeaningItem(selectedWordId));
+    var editWordItem = new JMenuItem("Edit word");
+    editWordItem.addActionListener(event -> handleEditWordItem(selectedWordId));
     var deleteWordItem = new JMenuItem("Delete word");
     deleteWordItem.addActionListener(event -> handleDeleteWordItem());
 
     popupMenu.add(addMeaningItem);
     popupMenu.add(addNewWordItem);
-    popupMenu.addSeparator();
+    popupMenu.add(addMeaningItemExperimental);
+    popupMenu.add(editWordItem);
     popupMenu.add(deleteWordItem);
     popupMenu.show(e.getComponent(), e.getX(), e.getY());
   }
 
   private void handleAddNewWordItem() {
+    INIT_Y_CELL = -1;
     var newWordPanel = new JPanel();
     newWordPanel.setLayout(new MigLayout());
 
     var textField = addTextField(newWordPanel, "Word", 20);
+    var warningLabel = new JLabel();
+    warningLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
+    warningLabel.setVisible(false);
+    newWordPanel.add(warningLabel, "cell 0 0");
+    textField.addKeyListener(new KeyListener() {
+      public void keyTyped(KeyEvent e) {}
+      public void keyPressed(KeyEvent e) {}
+      public void keyReleased(KeyEvent e) {
+        warningLabel.setVisible(wordService.isWordExistsByText(textField.getText()));
+      }
+    });
+
     var transcriptField = addTextField(newWordPanel, "Transcript", 20);
     var frequencyField = addTextField(newWordPanel, "Frequency", 20);
-    var topicField = addTextField(newWordPanel, "Topic", 20);
 
     var option = JOptionPane.showOptionDialog(
         null,
@@ -103,11 +124,15 @@ public class TableClickListener extends MouseAdapter {
 
     if (option == JOptionPane.OK_OPTION) {
       var dateCreated = new Date();
+      var frequencyText = frequencyField.getText().strip();
+      var transcriptText = transcriptField.getText().strip();
+      if (transcriptText.contains("/")) {
+        transcriptText = transcriptText.replace("/", StringUtils.EMPTY);
+      }
       var word = Word.builder()
           .text(textField.getText().strip())
-          .transcript(transcriptField.getText().strip())
-          .frequency(Integer.parseInt(frequencyField.getText().strip()))
-          .topic(topicField.getText().strip())
+          .transcript(transcriptText)
+          .frequency(StringUtils.isBlank(frequencyText) ? 0 : Integer.parseInt(frequencyText))
           .dateCreated(dateCreated)
           .lastModified(dateCreated)
           .build();
@@ -118,10 +143,10 @@ public class TableClickListener extends MouseAdapter {
   }
 
   private void handleDeleteWordItem() {
-    var tableModel = (DefaultTableModel) wordsTable.getModel();
+    var tableModel = (WordTableModel) wordsTable.getModel();
     var selectedRow = wordsTable.getSelectedRow();
-    var wordId = (String) tableModel.getValueAt(selectedRow, 0);
-    var wordText = (String) tableModel.getValueAt(selectedRow, 1);
+    var wordId = (Long) tableModel.getValueAt(selectedRow, WordTableModel.HIDDEN_WORD_ID);
+    var wordText = (String) tableModel.getValueAt(selectedRow, WordTableModel.COLUMN_WORD);
     var option = JOptionPane.showOptionDialog(
         null,
         new JLabel("<html>Are you sure that you want to delete <b>" + wordText + "</b> word?"),
@@ -137,7 +162,7 @@ public class TableClickListener extends MouseAdapter {
     }
 
     if (option == JOptionPane.OK_OPTION) {
-      wordService.delete(Long.parseLong(wordId));
+      wordService.delete(wordId);
       tableModel.removeRow(selectedRow);
     }
   }
@@ -157,7 +182,6 @@ public class TableClickListener extends MouseAdapter {
     var learningStatus = addComboBoxFieldEnums(newMeaningPanel, learningStatusStrings, "Learning status");
     var descriptionField = addTextField(newMeaningPanel, "Description");
     var examplesField = addTextAreaField(newMeaningPanel, "Examples");
-    var alsoField = addTextField(newMeaningPanel, "Also");
 
     var word = wordService.getById(selectedWordId);
     if (Objects.isNull(word)) {
@@ -187,7 +211,6 @@ public class TableClickListener extends MouseAdapter {
           .proficiencyLevel((ProficiencyLevel) proficiencyLeveField.getSelectedItem())
           .learningStatus(LearningStatus.findByLabel((String) learningStatus.getSelectedItem()))
           .description(descriptionField.getText())
-          .also(alsoField.getText())
           .examples(Arrays.stream(examplesField.getText().split("\\n")).filter(StringUtils::isNotBlank).toList())
           .word(word)
           .dateCreated(dateCreated)
@@ -196,6 +219,62 @@ public class TableClickListener extends MouseAdapter {
       meaningService.save(meaning);
       meaningTree.setWord(wordService.getById(selectedWordId));
       meaningTree.showSelectedUserObjectTree();
+    }
+  }
+
+  private void handleEditWordItem(Long selectedWordId) {
+    var exitingWord = wordService.getById(selectedWordId);
+    if (Objects.isNull(exitingWord)) {
+      return;
+    }
+    var existingWordPanel = new JPanel();
+    existingWordPanel.setLayout(new MigLayout());
+
+    var textField = addTextField(existingWordPanel, "Word", 20);
+    textField.setText(exitingWord.getText());
+    var transcriptField = addTextField(existingWordPanel, "Transcript", 20);
+    transcriptField.setText(exitingWord.getTranscript());
+    var frequencyField = addTextField(existingWordPanel, "Frequency", 20);
+    frequencyField.setText(exitingWord.getFrequency() == 0 ? "" : String.valueOf(exitingWord.getFrequency()));
+
+    var option = JOptionPane.showOptionDialog(
+        null,
+        existingWordPanel,
+        "Edit word: " + exitingWord.getText(),
+        JOptionPane.OK_CANCEL_OPTION,
+        JOptionPane.PLAIN_MESSAGE,
+        null,
+        new String[] {"Edit", "Cancel"},
+        null);
+
+    if (option == JOptionPane.CANCEL_OPTION) {
+      return;
+    }
+
+    if (option == JOptionPane.OK_OPTION) {
+      var isAnyUpdated = false;
+      var newText = textField.getText().strip();
+      if (!StringUtils.equals(exitingWord.getText(), newText)) {
+        exitingWord.setText(newText);
+        isAnyUpdated = true;
+      }
+      var newTranscript = transcriptField.getText().strip();
+      if (!StringUtils.equals(exitingWord.getTranscript(), newTranscript)) {
+        exitingWord.setTranscript(newTranscript);
+        isAnyUpdated = true;
+      }
+      var frequencyText = frequencyField.getText().strip();
+      var newFrequency = StringUtils.isBlank(frequencyText) ? 0 : Integer.parseInt(frequencyText);
+      if (!exitingWord.getFrequency().equals(newFrequency)) {
+        exitingWord.setFrequency(newFrequency);
+        isAnyUpdated = true;
+      }
+      if (!isAnyUpdated) {
+        return;
+      }
+      exitingWord.setLastModified(new Date());
+      wordService.save(exitingWord);
+      wordsTable.reloadTable();
     }
   }
 
@@ -221,7 +300,7 @@ public class TableClickListener extends MouseAdapter {
 
   private static JTextArea addTextAreaField(JPanel panel, String labelText) {
     var label = new JLabel(labelText);
-    var field = new JTextArea(6, 40);
+    var field = new JTextArea(8, 50);
     panel.add(label, String.format("cell 0 %s", INIT_Y_CELL += 1));
     panel.add(new JScrollPane(field), String.format("cell 1 %s", INIT_Y_CELL));
     return field;

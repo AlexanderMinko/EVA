@@ -13,6 +13,7 @@ import com.english.eva.repository.WordRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,7 @@ public class WordService {
   }
 
   public List<Word> getAll() {
-    var words = wordRepository.findAll();
+    var words = wordRepository.findAll(Sort.by(Sort.Direction.DESC, "dateCreated"));
     log.info("Founded {} words", words.size());
     return words;
   }
@@ -61,6 +62,10 @@ public class WordService {
     var result = wordRepository.findBySearchParams(params);
     log.info("Founded [{}] search results", result.size());
     return result;
+  }
+
+  public boolean isWordExistsByText(String text) {
+    return wordRepository.existsByText(text);
   }
 
   public void saveReserve() {

@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface WordRepository extends JpaRepository<Word, Long>, WordCustomRepository {
 
   List<Word> findByIdIn(Set<Long> ids);
+
+  boolean existsByText(String text);
 }

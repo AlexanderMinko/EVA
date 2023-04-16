@@ -19,6 +19,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -28,14 +29,14 @@ import org.springframework.data.annotation.LastModifiedDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Word {
+public class Word implements Comparable<Word> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(name = "text")
-  private String text;
+  private String text; //StringUtils.substringBefore("Stack Overflow - A place to ask stuff", " - ")
 
   @Column(name = "transcript")
   private String transcript;
@@ -60,4 +61,8 @@ public class Word {
   @OneToMany(mappedBy = "word", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Meaning> meaning;
 
+  @Override
+  public int compareTo(Word word) {
+    return word.getDateCreated().compareTo(dateCreated);
+  }
 }

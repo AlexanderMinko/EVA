@@ -32,10 +32,21 @@ public class MeaningService {
         saved.getProficiencyLevel(), saved.getDescription(), saved.getExamples());
   }
 
+  public void saveBatch(List<Meaning> meanings) {
+    var saved = meaningRepository.saveAll(meanings);
+    log.info("Meaning successfully has been saved. Size: [{}]", saved.size());
+  }
+
   public void updateLearningStatus(Long id, LearningStatus learningStatus) {
     meaningRepository.updateLearningStatus(id, learningStatus);
     log.info("Learning status has been successfully updated for meaning with id [{}]. New learning status is [{}]",
         id, learningStatus);
+  }
+
+  public void updatePartOfSpeech(Long id, PartOfSpeech partOfSpeech) {
+    meaningRepository.updatePartOfSPeach(id, partOfSpeech);
+    log.info("partOfSpeech has been successfully updated for meaning with id [{}]. New learning status is [{}]",
+        id, partOfSpeech);
   }
 
   public Meaning getMeaning(Long id) {

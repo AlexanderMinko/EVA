@@ -70,4 +70,13 @@ public class WordTableModel extends AbstractTableModel {
     };
   }
 
+  public void removeRow(int row) {
+    wordDtoList.remove(row);
+    fireTableRowsDeleted(row, row);
+  }
+
+  @Override
+  public boolean isCellEditable(int rowIndex, int columnIndex) {
+    return true;
+  }
 }

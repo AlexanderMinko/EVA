@@ -6,6 +6,7 @@ public enum PartOfSpeech {
   ADJECTIVE("Adjective"),
   ADVERB("Adverb"),
   AUXILIARY_VERB("Auxiliary verb"),
+  CONJUNCTION("Conjunction"),
   DETERMINER("Determiner"),
   EXCLAMATION("Exclamation"),
   MODAL_VERB("Modal verb"),

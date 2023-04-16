@@ -75,7 +75,7 @@ public class WordTableCellRenderer extends JPanel implements TableCellRenderer {
         levelLabel.setFont(new Font(font.getName(), Font.BOLD, font.getSize() - 2));
         levelLabel.setBackground(LEVEL_COLOURS.get(level));
         levelLabel.setForeground(Color.WHITE);
-        levelLabel.setBorder(new EmptyBorder(2, 5, 0, 5));
+        levelLabel.setBorder(new EmptyBorder(2, 3, 0, 3));
         add(levelLabel);
         add(Box.createRigidArea(new Dimension(5, 0)));
       }

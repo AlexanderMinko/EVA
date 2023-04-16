@@ -9,11 +9,14 @@ import com.english.eva.entity.MeaningSource;
 import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.entity.ProficiencyLevel;
 import com.english.eva.entity.Word;
+import com.english.eva.repository.MeaningRepository;
+import com.english.eva.repository.WordRepository;
 import com.english.eva.service.MeaningService;
 import com.english.eva.service.WordService;
 import com.english.eva.ui.panel.meaning.MeaningTree;
 import com.english.eva.ui.panel.meaning.TreeClickListener;
 import com.english.eva.ui.panel.settings.SettingsPanel;
+import com.english.eva.ui.panel.word.ExperimentalHandler;
 import com.english.eva.ui.panel.word.TableClickListener;
 import com.english.eva.ui.panel.word.WordsTableNew;
 import lombok.RequiredArgsConstructor;
@@ -29,16 +32,21 @@ public class ApplicationServiceRunner implements ApplicationRunner {
 
   private final WordService wordService;
   private final MeaningService meaningService;
+  private final WordRepository wordRepository;
+  private final MeaningRepository meaningRepository;
 
   @Override
-  public void run(ApplicationArguments args) throws Exception {
+  public void run(ApplicationArguments args) {
     WordsTableNew.setWordService(wordService);
     TableClickListener.setWordService(wordService);
     TableClickListener.setMeaningService(meaningService);
     SettingsPanel.setWordService(wordService);
     MeaningTree.setMeaningService(meaningService);
+    TreeClickListener.setWordService(wordService);
     TreeClickListener.setMeaningService(meaningService);
-
+    ExperimentalHandler.setWordService(wordService);
+    ExperimentalHandler.setMeaningService(meaningService);
+    log.info("Meanings: [{}]", meaningRepository.findAll().size());
 //    wordService.saveReserve();
 //    var path = Paths.get("/home/ming/English/words.json");
 //    var data = new ObjectMapper().readValue(Files.readAllBytes(path), new TypeReference<List<Word>>() {});

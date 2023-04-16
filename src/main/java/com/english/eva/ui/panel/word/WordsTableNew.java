@@ -10,13 +10,15 @@ import com.english.eva.entity.Word;
 import com.english.eva.service.WordService;
 import com.english.eva.ui.panel.meaning.MeaningTree;
 import lombok.Getter;
+import lombok.Setter;
 
 public class WordsTableNew extends JTable {
 
-  @Getter
-  public SortingDetails sortingDetails = new SortingDetails();
-
   private static WordService wordService;
+
+  @Getter
+  @Setter
+  public SortingDetails sortingDetails = new SortingDetails();
   private WordTableModel wordTableModel;
   private List<Word> words;
 
@@ -37,6 +39,8 @@ public class WordsTableNew extends JTable {
     getColumnModel().getColumn(WordTableModel.HIDDEN_WORD_ID).setResizable(false);
     getColumnModel().getColumn(WordTableModel.COLUMN_FREQUENCY).setPreferredWidth(90);
     getColumnModel().getColumn(WordTableModel.COLUMN_FREQUENCY).setMaxWidth(120);
+    getColumnModel().getColumn(WordTableModel.COLUMN_PROGRESS).setPreferredWidth(110);
+    getColumnModel().getColumn(WordTableModel.COLUMN_PROGRESS).setMaxWidth(110);
   }
 
   public void sortData() {
@@ -70,22 +74,23 @@ public class WordsTableNew extends JTable {
 
   public void reloadTable() {
     var wordsIds = words.stream().map(Word::getId).collect(Collectors.toSet());
-    this.words = wordService.getByWordIds(wordsIds);
+    this.words = wordService.getByWordIds(wordsIds).stream().sorted().toList();
     wordTableModel.setData(words);
     initColumnModel();
   }
 
   public void reloadTable(Word word) {
     var wordsIds = words.stream().map(Word::getId).collect(Collectors.toSet());
-    this.words = wordService.getByWordIds(wordsIds);
-    this.words.add(word);
-    wordTableModel.setData(words);
+    var currentWords = wordService.getByWordIds(wordsIds);
+    currentWords.add(word);
+    this.words = currentWords.stream().sorted().collect(Collectors.toList());
+    wordTableModel.setData(this.words);
     initColumnModel();
   }
 
   public void reloadTable(List<Word> words) {
-    this.words = words;
-    wordTableModel.setData(words);
+    this.words = words.stream().sorted().toList();
+    wordTableModel.setData(this.words);
     initColumnModel();
   }
 }

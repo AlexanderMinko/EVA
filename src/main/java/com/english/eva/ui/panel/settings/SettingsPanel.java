@@ -26,7 +26,9 @@ import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.ProficiencyLevel;
 import com.english.eva.model.SearchParams;
 import com.english.eva.service.WordService;
+import com.english.eva.ui.panel.word.SortingDetails;
 import com.english.eva.ui.panel.word.WordsTableNew;
+import org.apache.commons.lang3.StringUtils;
 
 public class SettingsPanel extends JPanel {
 
@@ -197,6 +199,7 @@ public class SettingsPanel extends JPanel {
     searchParams.statuses(selectedLearningStatuses);
     var searchResult = wordService.search(searchParams.build());
     wordsTable.reloadTable(searchResult);
+    wordsTable.setSortingDetails(new SortingDetails());
   }
 
   public void setWordsTable(WordsTableNew wordsTable) {

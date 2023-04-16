@@ -60,8 +60,8 @@ public class Meaning {
   @Column(name = "description", length = 1024)
   private String description;
 
-  @Column(name = "example", length = 1024)
-  @ElementCollection
+  @Column(name = "example", columnDefinition = "VARCHAR(2024)")
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "examples", joinColumns = @JoinColumn(name = "meaning_id"))
   private List<String> examples;
 

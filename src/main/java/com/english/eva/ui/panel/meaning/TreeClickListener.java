@@ -4,22 +4,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Objects;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import com.english.eva.entity.LearningStatus;
+import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.service.MeaningService;
+import com.english.eva.service.WordService;
 import com.english.eva.ui.panel.word.WordsTableNew;
 
 public class TreeClickListener extends MouseAdapter {
 
   private static MeaningService meaningService;
-
-  public static void setMeaningService(MeaningService meaningService) {
-    TreeClickListener.meaningService = meaningService;
-  }
+  private static WordService wordService;
 
   private final MeaningTree meaningTree;
   private final WordsTableNew wordsTable;
@@ -50,17 +50,35 @@ public class TreeClickListener extends MouseAdapter {
           .peek(menuItem -> menuItem.addActionListener(
               menuEvent -> handleLearningUpdate(id, LearningStatus.findByLabel(menuItem.getText()))))
           .forEach(popupMenu::add);
+      var partOfSpeechMenuItem = new JMenu("Part of Speech");
+      Arrays.stream(PartOfSpeech.values())
+          .map(part -> new JMenuItem(part.getLabel()))
+          .peek(menuItem -> menuItem.addActionListener(menuEvent -> handlePartOfSpeechUpdate(id, menuItem.getText())))
+          .forEach(partOfSpeechMenuItem::add);
+      popupMenu.addSeparator();
+      popupMenu.add(partOfSpeechMenuItem);
       popupMenu.show(event.getComponent(), event.getX(), event.getY());
     }
   }
 
   private void handleLearningUpdate(long id, LearningStatus putOff) {
     meaningService.updateLearningStatus(id, putOff);
-    reloadTree();
+    meaningTree.showSelectedUserObjectTree();
     wordsTable.reloadTable();
   }
 
-  private void reloadTree() {
+  private void handlePartOfSpeechUpdate(long id, String partOfSpeech) {
+    meaningService.updatePartOfSpeech(id, PartOfSpeech.findByLabel(partOfSpeech));
+    meaningTree.setWord(wordService.getById(meaningTree.getWord().getId()));
     meaningTree.showSelectedUserObjectTree();
+    wordsTable.reloadTable();
+  }
+
+  public static void setWordService(WordService wordService) {
+    TreeClickListener.wordService = wordService;
+  }
+
+  public static void setMeaningService(MeaningService meaningService) {
+    TreeClickListener.meaningService = meaningService;
   }
 }

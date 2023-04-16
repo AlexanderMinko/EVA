@@ -73,14 +73,15 @@ public class MeaningTree extends JTree {
           var descriptionNode = new DefaultMutableTreeNode(
               meaning.getProficiencyLevel() + "=" + meaning.getDescription());
           meaningNode.add(descriptionNode);
-//          meaningNode.add(new DefaultMutableTreeNode("!" + meaning.getLearningStatus().getLabel()));
           partOfSpeechNode.add(meaningNode);
           var examplesNode = new DefaultMutableTreeNode("Examples");
           for (String example : meaning.getExamples()) {
             var exampleNode = new DefaultMutableTreeNode(example);
             examplesNode.add(exampleNode);
           }
-          meaningNode.add(examplesNode);
+          if (CollectionUtils.isNotEmpty(meaning.getExamples())) {
+            meaningNode.add(examplesNode);
+          }
           sourceNode.add(partOfSpeechNode);
         }
       }
@@ -103,6 +104,10 @@ public class MeaningTree extends JTree {
 
   public void setWord(Word word) {
     this.word = word;
+  }
+
+  public Word getWord() {
+    return word;
   }
 
   public void setWordsTable(WordsTableNew wordsTable) {
