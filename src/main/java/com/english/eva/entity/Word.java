@@ -3,6 +3,9 @@ package com.english.eva.entity;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,9 +22,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Table(name = "words")
@@ -44,9 +44,6 @@ public class Word implements Comparable<Word> {
   @Column(name = "frequency")
   private Integer frequency;
 
-  @Column(name = "topic")
-  private String topic;
-
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created", nullable = false, updatable = false)
   @CreatedDate
@@ -59,10 +56,11 @@ public class Word implements Comparable<Word> {
 
   @ToString.Exclude
   @OneToMany(mappedBy = "word", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Meaning> meaning;
+  private List<Meaning> meanings;
 
   @Override
   public int compareTo(Word word) {
-    return word.getDateCreated().compareTo(dateCreated);
+    return word.getLastModified().compareTo(lastModified);
   }
+
 }

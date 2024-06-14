@@ -33,14 +33,14 @@ public class WordCustomRepositoryImpl implements WordCustomRepository {
 
     var levels = params.getLevels();
     if (CollectionUtils.isNotEmpty(levels)) {
-      var join = rootItem.join("meaning");
+      var join = rootItem.join("meanings");
       var predicate = builder.in(join.get("proficiencyLevel")).value(levels);
       predicates.add(predicate);
     }
 
     var statuses = params.getStatuses();
     if(CollectionUtils.isNotEmpty(statuses)) {
-      var join = rootItem.join("meaning");
+      var join = rootItem.join("meanings");
       var predicate = builder.in(join.get("learningStatus")).value(statuses);
       predicates.add(predicate);
     }

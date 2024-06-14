@@ -1,6 +1,6 @@
-package com.english.eva.ui.panel.word;
+package com.english.eva.ui.word;
 
-import static com.english.eva.ui.panel.util.ColorUtils.LEVEL_COLOURS;
+import static com.english.eva.ui.util.ColorUtils.LEVEL_COLOURS;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

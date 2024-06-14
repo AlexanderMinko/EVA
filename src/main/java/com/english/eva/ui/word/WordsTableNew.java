@@ -1,4 +1,4 @@
-package com.english.eva.ui.panel.word;
+package com.english.eva.ui.word;
 
 import java.util.Comparator;
 import java.util.List;
@@ -8,7 +8,7 @@ import javax.swing.JTable;
 
 import com.english.eva.entity.Word;
 import com.english.eva.service.WordService;
-import com.english.eva.ui.panel.meaning.MeaningTree;
+import com.english.eva.ui.meaning.MeaningTree;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,9 +55,9 @@ public class WordsTableNew extends JTable {
   private Comparator<Word> getSortingComparator() {
     Comparator<Word> comparator = null;
     if ("Word".equals(sortingDetails.getColumnName())) {
-      comparator = Comparator.comparing(Word::getText);
+      comparator = Comparator.comparing(Word::getText, String.CASE_INSENSITIVE_ORDER);
     } else if ("Frequency".equals(sortingDetails.getColumnName())) {
-      comparator = Comparator.comparing(Word::getFrequency);
+      comparator = Comparator.comparing(Word::getFrequency, Comparator.naturalOrder());
     }
     if (Objects.isNull(comparator)) {
       return null;

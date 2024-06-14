@@ -2,6 +2,9 @@ package com.english.eva.entity;
 
 import java.util.Arrays;
 
+import lombok.Getter;
+
+@Getter
 public enum PartOfSpeech {
   ADJECTIVE("Adjective"),
   ADVERB("Adverb"),
@@ -12,7 +15,7 @@ public enum PartOfSpeech {
   MODAL_VERB("Modal verb"),
   NOUN("Noun"),
   PHRASAL_VERB("Phrasal verb"),
-  PHASE("Phrase"),
+  PHRASE("Phrase"),
   PREPOSITION("Preposition"),
   PRONOUN("Pronoun"),
   VERB("Verb");
@@ -23,12 +26,10 @@ public enum PartOfSpeech {
     this.label = label;
   }
 
-  public String getLabel() {
-    return label;
-  }
-
   public static PartOfSpeech findByLabel(String label) {
-    return Arrays.stream(values()).filter(current -> current.getLabel().equals(label)).findFirst()
+    return Arrays.stream(values())
+        .filter(current -> current.getLabel().equalsIgnoreCase(label))
+        .findFirst()
         .orElse(null);
   }
 }

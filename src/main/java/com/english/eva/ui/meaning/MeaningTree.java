@@ -1,4 +1,4 @@
-package com.english.eva.ui.panel.meaning;
+package com.english.eva.ui.meaning;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -7,14 +7,20 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import com.english.eva.entity.Example;
 import com.english.eva.entity.Meaning;
 import com.english.eva.entity.MeaningSource;
 import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.entity.Word;
 import com.english.eva.service.MeaningService;
-import com.english.eva.ui.panel.word.WordsTableNew;
+import com.english.eva.ui.word.WordsTableNew;
 import org.apache.commons.collections4.CollectionUtils;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class MeaningTree extends JTree {
 
   private static MeaningService meaningService;
@@ -44,7 +50,7 @@ public class MeaningTree extends JTree {
   public void showSelectedUserObjectTree() {
     setRootVisible(false);
     var root = new DefaultMutableTreeNode(word.getText());
-    var meanings = word.getMeaning();
+    var meanings = word.getMeanings();
     var sources = meanings.stream().map(Meaning::getMeaningSource).distinct().toList();
 
     if (CollectionUtils.isEmpty(sources)) {
@@ -57,10 +63,13 @@ public class MeaningTree extends JTree {
       root.add(sourceNode);
       var partsOfSpeechBySource = meanings.stream()
           .filter(meaning -> meaning.getMeaningSource() == source)
-          .map(Meaning::getPartOfSpeech).distinct().sorted(Comparator.naturalOrder())
+          .map(Meaning::getPartOfSpeech)
+          .distinct()
+          .sorted(Comparator.naturalOrder())
           .toList();
       for (PartOfSpeech partOfSpeech : partsOfSpeechBySource) {
-        var partOfSpeechNode = new DefaultMutableTreeNode(word.getText() + " · " + partOfSpeech.getLabel());
+        //word.getText() + " · " +
+        var partOfSpeechNode = new DefaultMutableTreeNode(partOfSpeech.getLabel());
         var meaningsBySourceAndPartOfSpeech = meanings.stream()
             .filter(meaning -> meaning.getMeaningSource() == source)
             .filter(meaning -> meaning.getPartOfSpeech() == partOfSpeech)
@@ -75,8 +84,8 @@ public class MeaningTree extends JTree {
           meaningNode.add(descriptionNode);
           partOfSpeechNode.add(meaningNode);
           var examplesNode = new DefaultMutableTreeNode("Examples");
-          for (String example : meaning.getExamples()) {
-            var exampleNode = new DefaultMutableTreeNode(example);
+          for (Example example : meaning.getExamples()) {
+            var exampleNode = new DefaultMutableTreeNode(example.getText());
             examplesNode.add(exampleNode);
           }
           if (CollectionUtils.isNotEmpty(meaning.getExamples())) {
@@ -100,14 +109,6 @@ public class MeaningTree extends JTree {
       }
     }
     setVisible(true);
-  }
-
-  public void setWord(Word word) {
-    this.word = word;
-  }
-
-  public Word getWord() {
-    return word;
   }
 
   public void setWordsTable(WordsTableNew wordsTable) {

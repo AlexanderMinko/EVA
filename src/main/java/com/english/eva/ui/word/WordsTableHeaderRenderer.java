@@ -1,4 +1,4 @@
-package com.english.eva.ui.panel.word;
+package com.english.eva.ui.word;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

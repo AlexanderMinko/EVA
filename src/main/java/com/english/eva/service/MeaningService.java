@@ -4,12 +4,15 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import com.english.eva.entity.Example;
 import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.Meaning;
 import com.english.eva.entity.MeaningSource;
 import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.entity.ProficiencyLevel;
+import com.english.eva.repository.ExampleRepository;
 import com.english.eva.repository.MeaningRepository;
+import com.english.eva.repository.WordRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MeaningService {
 
   private final MeaningRepository meaningRepository;
+  private final WordRepository wordRepository;
 
   public void save(Meaning meaning) {
     var saved = meaningRepository.save(meaning);
@@ -39,6 +43,9 @@ public class MeaningService {
 
   public void updateLearningStatus(Long id, LearningStatus learningStatus) {
     meaningRepository.updateLearningStatus(id, learningStatus);
+    var word = wordRepository.findByMeaningsIn(List.of(meaningRepository.findById(id).get())).get();
+    word.setLastModified(new Date());
+    wordRepository.save(word);
     log.info("Learning status has been successfully updated for meaning with id [{}]. New learning status is [{}]",
         id, learningStatus);
   }
@@ -77,8 +84,7 @@ public class MeaningService {
     private MeaningSource meaningSource;
     private LearningStatus learningStatus;
     private String description;
-    private List<String> examples;
-    private String also;
+    private List<Example> examples;
     private Date dateCreated;
     private Date lastModified;
     private Long wordId;
@@ -92,7 +98,6 @@ public class MeaningService {
       this.learningStatus = meaning.getLearningStatus();
       this.description = meaning.getDescription();
       this.examples = meaning.getExamples();
-      this.also = meaning.getAlso();
       this.dateCreated = meaning.getDateCreated();
       this.lastModified = meaning.getLastModified();
       this.wordId = meaning.getWord().getId();

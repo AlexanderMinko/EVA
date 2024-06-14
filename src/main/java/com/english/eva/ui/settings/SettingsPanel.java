@@ -1,10 +1,10 @@
-package com.english.eva.ui.panel.settings;
+package com.english.eva.ui.settings;
 
 import static javax.swing.GroupLayout.Alignment.BASELINE;
 import static javax.swing.GroupLayout.Alignment.LEADING;
 
-import static com.english.eva.ui.panel.util.ColorUtils.LEARNING_COLOURS;
-import static com.english.eva.ui.panel.util.ColorUtils.LEVEL_COLOURS;
+import static com.english.eva.ui.util.ColorUtils.LEARNING_COLOURS;
+import static com.english.eva.ui.util.ColorUtils.LEVEL_COLOURS;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -26,9 +26,8 @@ import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.ProficiencyLevel;
 import com.english.eva.model.SearchParams;
 import com.english.eva.service.WordService;
-import com.english.eva.ui.panel.word.SortingDetails;
-import com.english.eva.ui.panel.word.WordsTableNew;
-import org.apache.commons.lang3.StringUtils;
+import com.english.eva.ui.word.SortingDetails;
+import com.english.eva.ui.word.WordsTableNew;
 
 public class SettingsPanel extends JPanel {
 
@@ -36,16 +35,9 @@ public class SettingsPanel extends JPanel {
   private WordsTableNew wordsTable;
 
   private JTextField wordSearchValueField;
-  private JToggleButton toggleButtonA1;
-  private JToggleButton toggleButtonA2;
-  private JToggleButton toggleButtonB1;
-  private JToggleButton toggleButtonB2;
-  private JToggleButton toggleButtonC1;
-  private JToggleButton toggleButtonC2;
-  private JToggleButton toggleButtonJ7;
-  private JToggleButton toggleButtonAllLevels;
   private List<JToggleButton> levelButtonsList;
   private JPanel levelsPanel;
+  private JPanel learningStatusPanel;
   private JButton searchButton;
 
   private List<JToggleButton> learningStatusButtonList;
@@ -61,13 +53,28 @@ public class SettingsPanel extends JPanel {
     initWordSearchValueField();
     initSearchButton();
     initLevelsBar();
+    initLearningStatusBar();
 
+    groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
+        .addGroup(groupLayout.createParallelGroup(LEADING).addComponent(wordSearchValueField).addComponent(levelsPanel))
+        .addGroup(
+            groupLayout.createParallelGroup(LEADING).addComponent(searchButton).addComponent(learningStatusPanel)));
+
+    groupLayout.setVerticalGroup(groupLayout.createSequentialGroup()
+        .addGroup(
+            groupLayout.createParallelGroup(BASELINE).addComponent(wordSearchValueField).addComponent(searchButton))
+        .addGroup(
+            groupLayout.createParallelGroup(BASELINE).addComponent(levelsPanel).addComponent(learningStatusPanel)));
+  }
+
+  private void initLearningStatusBar() {
     var toggleButtonKnown = new JToggleButton(LearningStatus.KNOWN.getLabel());
     var toggleButtonLearnt = new JToggleButton(LearningStatus.LEARNT.getLabel());
     var toggleButtonLearning = new JToggleButton(LearningStatus.LEARNING.getLabel());
     var toggleButtonPutOff = new JToggleButton(LearningStatus.PUT_OFF.getLabel());
+    var toggleButtonUndefined = new JToggleButton(LearningStatus.UNDEFINED.getLabel());
     var toggleButtonAllLearningStatuses = new JToggleButton("Select All");
-    learningStatusButtonList = List.of(toggleButtonKnown, toggleButtonLearnt, toggleButtonLearning, toggleButtonPutOff);
+    learningStatusButtonList = List.of(toggleButtonKnown, toggleButtonLearnt, toggleButtonLearning, toggleButtonPutOff, toggleButtonUndefined);
     learningStatusButtonList.forEach(toggle -> {
       toggle.setBackground(LEARNING_COLOURS.get(toggle.getText()));
       var font = toggle.getFont();
@@ -86,21 +93,10 @@ public class SettingsPanel extends JPanel {
         }
       });
     });
-    var learningStatusPanel = new JPanel();
+    learningStatusPanel = new JPanel();
     learningStatusPanel.setLayout(new BoxLayout(learningStatusPanel, BoxLayout.X_AXIS));
     learningStatusButtonList.forEach(learningStatusPanel::add);
     learningStatusPanel.add(toggleButtonAllLearningStatuses);
-
-    groupLayout.setHorizontalGroup(groupLayout.createSequentialGroup()
-        .addGroup(groupLayout.createParallelGroup(LEADING).addComponent(wordSearchValueField).addComponent(levelsPanel))
-        .addGroup(
-            groupLayout.createParallelGroup(LEADING).addComponent(searchButton).addComponent(learningStatusPanel)));
-
-    groupLayout.setVerticalGroup(groupLayout.createSequentialGroup()
-        .addGroup(
-            groupLayout.createParallelGroup(BASELINE).addComponent(wordSearchValueField).addComponent(searchButton))
-        .addGroup(
-            groupLayout.createParallelGroup(BASELINE).addComponent(levelsPanel).addComponent(learningStatusPanel)));
   }
 
   private void initSearchButton() {
@@ -110,14 +106,14 @@ public class SettingsPanel extends JPanel {
   }
 
   private void initLevelsBar() {
-    toggleButtonA1 = new JToggleButton(ProficiencyLevel.A1.name());
-    toggleButtonA2 = new JToggleButton(ProficiencyLevel.A2.name());
-    toggleButtonB1 = new JToggleButton(ProficiencyLevel.B1.name());
-    toggleButtonB2 = new JToggleButton(ProficiencyLevel.B2.name());
-    toggleButtonC1 = new JToggleButton(ProficiencyLevel.C1.name());
-    toggleButtonC2 = new JToggleButton(ProficiencyLevel.C2.name());
-    toggleButtonJ7 = new JToggleButton(ProficiencyLevel.J7.name());
-    toggleButtonAllLevels = new JToggleButton("Select All");
+    var toggleButtonA1 = new JToggleButton(ProficiencyLevel.A1.name());
+    var toggleButtonA2 = new JToggleButton(ProficiencyLevel.A2.name());
+    var toggleButtonB1 = new JToggleButton(ProficiencyLevel.B1.name());
+    var toggleButtonB2 = new JToggleButton(ProficiencyLevel.B2.name());
+    var toggleButtonC1 = new JToggleButton(ProficiencyLevel.C1.name());
+    var toggleButtonC2 = new JToggleButton(ProficiencyLevel.C2.name());
+    var toggleButtonJ7 = new JToggleButton(ProficiencyLevel.J7.name());
+    var toggleButtonAllLevels = new JToggleButton("Select All");
 
     levelButtonsList = List.of(toggleButtonA1, toggleButtonA2, toggleButtonB1, toggleButtonB2, toggleButtonC1,
         toggleButtonC2, toggleButtonJ7);

@@ -1,4 +1,4 @@
-package com.english.eva.ui.panel.word;
+package com.english.eva.ui.word;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -8,19 +8,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.table.DefaultTableModel;
 
+import javax.swing.*;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.english.eva.entity.Example;
 import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.Meaning;
 import com.english.eva.entity.MeaningSource;
@@ -29,9 +22,9 @@ import com.english.eva.entity.ProficiencyLevel;
 import com.english.eva.entity.Word;
 import com.english.eva.service.MeaningService;
 import com.english.eva.service.WordService;
-import com.english.eva.ui.panel.meaning.MeaningTree;
+import com.english.eva.ui.meaning.MeaningTree;
+
 import net.miginfocom.swing.MigLayout;
-import org.apache.commons.lang3.StringUtils;
 
 public class TableClickListener extends MouseAdapter {
 
@@ -137,7 +130,7 @@ public class TableClickListener extends MouseAdapter {
           .lastModified(dateCreated)
           .build();
       var saved = wordService.save(word);
-      saved.setMeaning(new ArrayList<>());
+      saved.setMeanings(new ArrayList<>());
       wordsTable.reloadTable(saved);
     }
   }
@@ -176,11 +169,14 @@ public class TableClickListener extends MouseAdapter {
     var learningStatusStrings = Arrays.stream(LearningStatus.values()).map(LearningStatus::getLabel).toArray(String[]::new);
 
     var sourceField = addComboBoxFieldEnums(newMeaningPanel, sourceStrings, "Source");
+    sourceField.setSelectedItem(MeaningSource.CAMBRIDGE_DICTIONARY.getLabel());
     var targetField = addTextField(newMeaningPanel, "Target");
     var partOfSpeechField = addComboBoxFieldEnums(newMeaningPanel, partOfSpeechStrings, "Part of speech");
     var proficiencyLeveField = addComboBoxFieldEnums(newMeaningPanel, ProficiencyLevel.values(), "Proficiency level");
+    proficiencyLeveField.setSelectedItem(ProficiencyLevel.J7);
     var learningStatus = addComboBoxFieldEnums(newMeaningPanel, learningStatusStrings, "Learning status");
-    var descriptionField = addTextField(newMeaningPanel, "Description");
+    learningStatus.setSelectedItem(LearningStatus.LEARNING.getLabel());
+    var descriptionField = addTextField(newMeaningPanel, "Description", 50);
     var examplesField = addTextAreaField(newMeaningPanel, "Examples");
 
     var word = wordService.getById(selectedWordId);
@@ -205,17 +201,21 @@ public class TableClickListener extends MouseAdapter {
     if (option == JOptionPane.OK_OPTION) {
       var dateCreated = new Date();
       var meaning = Meaning.builder()
-          .meaningSource(MeaningSource.findByLabel((String) sourceField.getSelectedItem()))
-          .target(targetField.getText())
-          .partOfSpeech(PartOfSpeech.findByLabel((String) partOfSpeechField.getSelectedItem()))
-          .proficiencyLevel((ProficiencyLevel) proficiencyLeveField.getSelectedItem())
-          .learningStatus(LearningStatus.findByLabel((String) learningStatus.getSelectedItem()))
-          .description(descriptionField.getText())
-          .examples(Arrays.stream(examplesField.getText().split("\\n")).filter(StringUtils::isNotBlank).toList())
-          .word(word)
-          .dateCreated(dateCreated)
-          .lastModified(dateCreated)
-          .build();
+              .meaningSource(MeaningSource.findByLabel((String) sourceField.getSelectedItem()))
+              .target(targetField.getText())
+              .partOfSpeech(PartOfSpeech.findByLabel((String) partOfSpeechField.getSelectedItem()))
+              .proficiencyLevel((ProficiencyLevel) proficiencyLeveField.getSelectedItem())
+              .learningStatus(LearningStatus.findByLabel((String) learningStatus.getSelectedItem()))
+              .description(descriptionField.getText())
+              .word(word)
+              .dateCreated(dateCreated)
+              .lastModified(dateCreated)
+              .build();
+      var examples = Arrays.stream(examplesField.getText().split("\\n"))
+          .filter(StringUtils::isNotBlank)
+          .map(text -> new Example(text, meaning))
+          .toList();
+      meaning.setExamples(examples);
       meaningService.save(meaning);
       meaningTree.setWord(wordService.getById(selectedWordId));
       meaningTree.showSelectedUserObjectTree();
@@ -272,7 +272,7 @@ public class TableClickListener extends MouseAdapter {
       if (!isAnyUpdated) {
         return;
       }
-      exitingWord.setLastModified(new Date());
+//      exitingWord.setLastModified(new Date());
       wordService.save(exitingWord);
       wordsTable.reloadTable();
     }

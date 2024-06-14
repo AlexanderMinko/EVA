@@ -1,17 +1,13 @@
-package com.english.eva.ui.panel.meaning;
+package com.english.eva.ui.meaning;
 
-import static com.english.eva.ui.panel.util.ColorUtils.LEARNING_COLOURS;
-import static com.english.eva.ui.panel.util.ColorUtils.LEVEL_COLOURS;
+import static com.english.eva.ui.util.ColorUtils.LEARNING_COLOURS;
+import static com.english.eva.ui.util.ColorUtils.LEVEL_COLOURS;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTree;
+
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;

@@ -1,8 +1,10 @@
 package com.english.eva.entity;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import lombok.Getter;
+
+@Getter
 public enum MeaningSource {
   ENGLISH_PROFILE("English Profile"),
   CAMBRIDGE_DICTIONARY("Cambridge dictionary"),
@@ -14,12 +16,10 @@ public enum MeaningSource {
     this.label = label;
   }
 
-  public String getLabel() {
-    return label;
-  }
-
   public static MeaningSource findByLabel(String label) {
-    return Arrays.stream(values()).filter(current -> current.getLabel().equals(label)).findFirst()
+    return Arrays.stream(values())
+        .filter(current -> current.getLabel().equalsIgnoreCase(label))
+        .findFirst()
         .orElse(null);
   }
 }

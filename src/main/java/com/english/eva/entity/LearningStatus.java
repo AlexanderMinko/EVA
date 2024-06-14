@@ -7,7 +7,8 @@ public enum LearningStatus {
   KNOWN("Known"),
   LEARNT("Learnt"),
   LEARNING("Learning"),
-  PUT_OFF("Put off");
+  PUT_OFF("Put off"),
+  UNDEFINED("Undefined");
 
   private final String label;
 
@@ -20,7 +21,9 @@ public enum LearningStatus {
   }
 
   public static LearningStatus findByLabel(String label) {
-    return Arrays.stream(values()).filter(current -> current.getLabel().equals(label)).findFirst()
+    return Arrays.stream(values())
+        .filter(current -> current.getLabel().equalsIgnoreCase(label))
+        .findFirst()
         .orElse(null);
   }
 }

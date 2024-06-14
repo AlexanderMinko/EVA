@@ -1,11 +1,10 @@
-package com.english.eva.ui.panel.word;
+package com.english.eva.ui.word;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -14,6 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.english.eva.entity.Example;
 import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.Meaning;
 import com.english.eva.entity.MeaningSource;
@@ -21,9 +21,8 @@ import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.entity.ProficiencyLevel;
 import com.english.eva.service.MeaningService;
 import com.english.eva.service.WordService;
-import com.english.eva.ui.panel.meaning.MeaningTree;
+import com.english.eva.ui.meaning.MeaningTree;
 import net.miginfocom.swing.MigLayout;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class ExperimentalHandler {
@@ -96,14 +95,16 @@ public class ExperimentalHandler {
         var proficiencyLevel = meaningStringsList.get(1).substring(0, 2);
         var description = meaningStringsList.get(1).substring(2).strip();
 //        var simpleExamples = meaningStringsList.stream().filter(s -> s.contains("Dictionary examples:")).findFirst().orElse(StringUtils.EMPTY);
-        var simpleExamples = new ArrayList<String>();
+        var simpleExamples = new ArrayList<Example>();
         var startAdd = false;
         for (String s : meaningStringsList) {
+          var example = new Example();
           if (s.contains("Learner example")) {
             startAdd = false;
           }
           if (startAdd) {
-            simpleExamples.add(s);
+            example.setText(s);
+            simpleExamples.add(example);
           }
           if (s.contains("Dictionary example")) {
             startAdd = true;
@@ -115,7 +116,9 @@ public class ExperimentalHandler {
 //            .collect(Collectors.toList());
         var learnerExample = meaningStringsList.stream().filter(str -> str.endsWith(")") &&
             (str.contains(".") || str.contains("!") || str.contains("?"))).findFirst().orElse(StringUtils.EMPTY);
-        simpleExamples.add(learnerExample.substring(0, learnerExample.indexOf("(")).strip());
+        var exampleLearner = new Example();
+        exampleLearner.setText(learnerExample.substring(0, learnerExample.indexOf("(")).strip());
+        simpleExamples.add(exampleLearner);
         var dateCreated = new Date();
         var meaning = Meaning.builder()
             .meaningSource(MeaningSource.ENGLISH_PROFILE)
@@ -129,6 +132,7 @@ public class ExperimentalHandler {
             .dateCreated(dateCreated)
             .lastModified(dateCreated)
             .build();
+        simpleExamples.forEach(exampl -> exampl.setMeaning(meaning));
         meanings.add(meaning);
       }
       meaningService.saveBatch(meanings);

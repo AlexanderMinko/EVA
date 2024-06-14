@@ -1,4 +1,4 @@
-package com.english.eva.ui.panel.util;
+package com.english.eva.ui.util;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -29,6 +29,7 @@ public class ColorUtils {
     LEARNING_COLOURS.put(LearningStatus.LEARNING.getLabel(), new Color(255, 189, 128));
     LEARNING_COLOURS.put(LearningStatus.PUT_OFF.getLabel(), new Color(184, 148, 197));
     LEARNING_COLOURS.put(LearningStatus.LEARNT.getLabel(), new Color(85, 173, 129));
+    LEARNING_COLOURS.put(LearningStatus.UNDEFINED.getLabel(), new Color(232, 218, 237));
   }
 
 }

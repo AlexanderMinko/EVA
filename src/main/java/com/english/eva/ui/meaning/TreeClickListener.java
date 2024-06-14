@@ -1,4 +1,4 @@
-package com.english.eva.ui.panel.meaning;
+package com.english.eva.ui.meaning;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,7 +14,7 @@ import com.english.eva.entity.LearningStatus;
 import com.english.eva.entity.PartOfSpeech;
 import com.english.eva.service.MeaningService;
 import com.english.eva.service.WordService;
-import com.english.eva.ui.panel.word.WordsTableNew;
+import com.english.eva.ui.word.WordsTableNew;
 
 public class TreeClickListener extends MouseAdapter {
 

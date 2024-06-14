@@ -1,4 +1,4 @@
-package com.english.eva.ui.panel.word;
+package com.english.eva.ui.word;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +20,7 @@ public class WordTableModel extends AbstractTableModel {
 
   public WordTableModel(List<Word> words) {
     this.wordDtoList = words.stream().map(WordDto::new).collect(Collectors.toList());
+
     int indexCount = 1;
     for (WordDto word : this.wordDtoList) {
       word.setIndex(indexCount++);
